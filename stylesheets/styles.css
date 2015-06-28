@@ -2,43 +2,113 @@
 /*Styles*/
 * {
   margin: 0;
+  font-size: 1em;
 }
 body {
   background-color: #ecebe8;
 }
-header #title {
+header {
+  padding: 5px;
+}
+header p {
   display: inline;
+}
+header #title {
   margin-right: 10px;
   font-size: 4em;
   font-weight: bold;
 }
 header #tagline {
   font-size: 2em;
-  display: inline;
 }
 header #login-status {
   float: right;
+  margin: 10px;
+  font-size: 1.5em;
 }
-.container {
-  display: table;
-  width: 100%;
-}
-.cell {
-  display: table-cell;
+header #login-status p {
+  color: #84bd00;
 }
 footer {
+  height: 100px;
+  padding: 15px;
+  letter-spacing: 0.5px;
   background-color: black;
   color: white;
+  font-size: 1.25em;
 }
-.item-name {
+footer a:link,
+footer a:visited,
+footer a:hover,
+footer a:active {
+  text-decoration: none;
+  color: #84bd00;
+}
+#playlist-area {
+  margin: auto 20px auto 20px;
+}
+#playlist-area #playlist-input {
+  height: 50px;
+}
+#playlist-area #playlist-list {
+  height: 50px;
+  font-size: 1.25em;
   font-weight: bold;
   color: #84bd00;
 }
-.result {
+#playlist-area #playlist-button {
+  height: 50px;
+  font-size: 1.25em;
+  background-color: #84bd00;
+}
+#search-area {
+  max-width: 550px;
+  margin: auto;
+}
+#search-area #search-bar {
+  width: 100%;
+}
+#search-area #search-bar select {
+  width: 100px;
+  height: 50px;
+  border: 1px solid rgba(255, 0, 0, 0);
+  border-radius: 0px;
+  background: rgba(132, 189, 0, 0);
+  font-size: 1.25em;
+}
+#search-area #search-input {
+  width: 300px;
+  height: 50px;
+}
+#search-area #search-button {
+  width: 100px;
+  height: 50px;
+  font-size: 1.25em;
+  background-color: #84bd00;
+}
+#search-area #search-results {
+  font-size: 2em;
+  font-weight: bold;
+  color: #84bd00;
+}
+#search-area #search-results .result-item {
   display: block;
 }
-#sorry {
-  font-weight: bold;
+input {
+  padding-left: 5px;
+  border: 0;
+  background: transparent;
+  font-size: 1.75em;
+  color: black;
+}
+.add-button,
+.remove-button {
+  margin: 0px 5px 0px 0px;
+  color: black;
+}
+.add-button:hover,
+.remove-button:hover {
+  color: white;
 }
 a:link,
 a:visited,

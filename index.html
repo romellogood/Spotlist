@@ -14,40 +14,29 @@
 </head>
 <body>
   <header>
+    <div id="login-status">
+      <a href="https://accounts.spotify.com/authorize?client_id=66dbe5ac0dc04f3ca53b78f802c07153&redirect_uri=http://localhost:8000&scope=playlist-modify%20playlist-modify-public%20&response_type=token&state=123">
+        <p>Log-In</p>
+      </a>
+    </div>
     <p id="title">Spotlist</p >
     <p id="tagline">Easily create a Spotify Playlist.</p>
-    <a href="https://accounts.spotify.com/authorize?client_id=66dbe5ac0dc04f3ca53b78f802c07153&redirect_uri=http://localhost:8000&scope=playlist-modify%20playlist-modify-public%20&response_type=token&state=123">
-      <p id="login-status">Log-In</p>
-    </a>
   </header>
-  <!-- <section id="playlist-area">
+  <section id="playlist-area" class="col-sm-5">
     <input type="text" id="playlist-input" placeholder="Name your playlist.">
-    <ul id="playlist-list"></ul>
-    <button id="playlist-buton" onclick="savePlaylist()">Save Playlist</button>
-  </section> -->
-  <div class = "container">
-    <div class = "cell">
-        <input type="text" id="playlist-input" placeholder="Name your playlist.">
-    </div>
-    <div class = "cell"> <!--make sure it's only large enough to fit the button-->
-        <button id="playlist-buton" onclick="savePlaylist()">Save Playlist</button>
-    </div>
-</div>
-  <section id="search-area">
+    <button id="playlist-button" class="btn" onclick="savePlaylist()">Save Playlist</button>
+    <div id="playlist-list"></div>
+  </section>
+  <section id="search-area" class="col-sm-7">
     <article id="search-bar">
       <select>
         <option value="artist">Artist</option>
         <option value="track">Track</option>
       </select>
-      <input type="text" id="search-input" placeholder="Search by Artist or Song?">
-      <button id="search-buton" onclick="search($('select').val(),$('#search-input').val())">Search</button>
+      <input type="text" id="search-input" placeholder="Search by Artist or Song.">
+      <button id="search-button" class="btn" onclick="search($('select').val(),$('#search-input').val())">Search</button>
     </article>
-    <h1 id="search-query"></h1>
     <article id="search-results"></article>
   </section>
-  <footer>
-    <p>Made by: <a href="http://romellogoodman.com" target="_blank">Romello Goodman</a></p>
-    <p>Check out the code on <a href="http://github.com/romellogood/spotlist" target="_blank">Github</a></p>
-  </footer>
 </body>
 </html>
