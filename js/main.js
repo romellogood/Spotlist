@@ -25,7 +25,7 @@ function makeRequest(type, url, params, cbk) {
 
 function search(type, query) {
   if(query === '') {
-    warn('Sorry, that was an empty search.');
+    displayMessage('Sorry, that was an empty search.');
   } else {
     makeRequest(
       'get',
@@ -45,7 +45,7 @@ function search(type, query) {
 }
 
 //Display a message to the user
-function warn(message) {
+function displayMessage(message) {
   $('#search-results').html(message);
 }
 
@@ -53,7 +53,7 @@ function warn(message) {
 function appendToPage(data, type) {
   $('#search-results').html(' ');
   if(data.length === 0) {
-    warn('Sorry, we couldn\'t find that.');
+    displayMessage('Sorry, we couldn\'t find that.');
   } else {
     for(var result in data) {
       if(type == 'artist') {
@@ -112,6 +112,7 @@ function playTrack(trackID) {
         if(audioObject) {
           audioObject.pause();
         }
+        $('#' + trackID).addClass('playing');
         audioObject = new Audio(data.preview_url);
         audioObject.play();
         audioObject.addEventListener('ended', function () {
@@ -120,12 +121,10 @@ function playTrack(trackID) {
         audioObject.addEventListener('pause', function () {
           $('.playing').removeClass('playing');
         });
-        $('#' + trackID).addClass('playing');
       }
     }
   );
 }
-
 
 //ID Form = artistName{-]songName{-]songID
 function addToPlaylist(id) {
@@ -154,12 +153,12 @@ function removeFromPlaylist(id) {
 
 function savePlaylist() {
   if(accessToken === null) {
-    warn('Please login to save your playlist.');
+    displayMessage('Please login to save your playlist.');
   } else if($.isEmptyObject(playlist)) {
-    warn('Please add a song before saving the playlist.');
+    displayMessage('Please add a song before saving the playlist.');
   } else {
     if($('#playlist-input').val() === "") {
-      warn('Please name your playlist first.');
+      displayMessage('Please name your playlist first.');
     }
     else {
       var playlistData = { 'uris': [] };
@@ -198,7 +197,7 @@ function savePlaylist() {
               'data': JSON.stringify(playlistData),
             },
             function(data) {
-              console.log('Successfully created playlist and added songs!');
+              displayMessage('Successfully created the playlist: ' + $('#playlist-input').val());
             }
           );
         }
@@ -243,13 +242,12 @@ function checkLoginStatus() {
   if(accessToken) {
     getUserID();
   } else {
-    warn('First, login to Spotify!');
+    displayMessage('First, login to Spotify!');
   }
 }
 
 $(document).ready(function () {
   checkLoginStatus();
-  search('artist', 'childish gambino'); //TODO - remove
   //Excute different operations based on which input is focused
   $('input').keyup(function (e) {
     if(e.keyCode == 13) {

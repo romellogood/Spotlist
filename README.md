@@ -6,6 +6,8 @@ A webapp for creating Spotify Playlists
 
 run `grunt` to concat and minify everything.
 
+run `python -m SimpleHTTPServer` to run on a local server
+
 ##Dependencies
 
 * jQuery
@@ -17,11 +19,13 @@ run `grunt` to concat and minify everything.
 2. Get the user's userID
 3. User search by artist or track
   * By artist
-    1. Get the artist's uri from spotify and get their top tracks
+    1. Get the artist's uri from Spotify and get their top tracks
   * By Track
     1. Return the results from Spotify's search
 4. User clicks on a track
   * Add that track the playlist and store in a dictionary
-5. User adds multiple tracks
-6. User names & creates the playlist
-7. User has created spotify playlist
+5. User clicks on the music icon
+  * Retrieve the 30 second preview from Spotify
+6. User adds multiple tracks
+7. User names & creates the playlist
+8. User has created spotify playlist

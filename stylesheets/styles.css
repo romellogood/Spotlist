@@ -30,6 +30,21 @@ header #title {
 header #tagline {
   font-size: 2em;
 }
+header #by-line {
+  display: block;
+  font-size: 1.1em;
+}
+header a:link,
+header a:visited,
+header a:hover,
+header a:active {
+  text-decoration: none;
+  color: #84bd00;
+}
+header a:hover {
+  text-decoration: none;
+  color: black;
+}
 #playlist-area #playlist-bar {
   width: 100%;
   margin-bottom: 10px;
