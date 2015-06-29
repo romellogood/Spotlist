@@ -4,24 +4,20 @@ var playlist    = {},
 
 function search(type, query) {
   if(query !== '') {
-    var searchUrl = 'https://api.spotify.com/v1/search?q=' + query + '&type=' + type;
-    $.ajax({
-      type: 'GET',
-      dataType: 'json',
-      url: searchUrl,
-      crossDomain : true,
-      xhrFields: {
-        withCredentials: false
+    makeRequest(
+      'get',
+      'https://api.spotify.com/v1/search?q=' + query + '&type=' + type,
+      {
+        'dataType': 'json',
+      },
+      function(data) {
+        if(type == 'artist') {
+          appendToPage(data.artists.items,'artist');
+        } else {
+          appendToPage(data.tracks.items, 'track');
+        }
       }
-    })
-    .done(function(data) {
-      if(type == 'artist') {
-        appendToPage(data.artists.items,'artist');
-      } else {
-        appendToPage(data.tracks.items, 'track');
-      }
-    })
-    .fail( function(xhr, textStatus, errorThrown) { alert(xhr.responseText); });
+    );
   } else {
     warn('Sorry there weren\'t any search parameters.');
   }
@@ -41,7 +37,7 @@ function appendToPage(data, type) {
         /*jshint multistr: true */
         $('#search-results').append(
           '<div class="result"> \
-            <p id="' + data[result].id + '" onclick="getArtistTracks(this.id)">' + data[result].name +'</p> \
+            <p id="' + data[result].id + '" onclick="getArtistsTracks(this.id)">' + data[result].name +'</p> \
           </div>'
       );
       } else {
@@ -63,27 +59,23 @@ function appendToPage(data, type) {
   }
 }
 
-function getArtistTracks(artistURL) {
-  var searchUrl = 'https://api.spotify.com/v1/artists/' + artistURL + '/top-tracks?country=US';
-  $.ajax({
-    type: 'GET',
-    dataType: 'json',
-    url: searchUrl,
-    crossDomain : true,
-    xhrFields: {
-      withCredentials: false
+function getArtistsTracks(artistID) {
+  makeRequest(
+    'get',
+    'https://api.spotify.com/v1/artists/' + artistID + '/top-tracks?country=US',
+    {
+      'dataType': 'json',
+    },
+    function(data) {
+      appendToPage(data.tracks, 'track');
     }
-  })
-  .done(function(data) {
-    appendToPage(data.tracks, 'track');
-  })
-  .fail( function(xhr, textStatus, errorThrown) { alert(xhr.responseText); });
+  );
 }
 
-//Add into dictionary. Use dictionary so there won't be duplicates.
 //ID Form = artistName-songName-songID
 function addToPlaylist(id) {
   id = id.split('{-]');
+  //Add songs into dictionary. Use dictionary so there won't be duplicates.
   if(playlist[id[2]] === undefined) {
     playlist[id[2]] = 1;
     /*jshint multistr: true */
@@ -103,83 +95,81 @@ function removeFromPlaylist(id) {
 
 function savePlaylist() {
   if(accessToken !== null) {
-    var playlistData = { "uris": [] };
-    for(var song in playlist) {
-      playlistData.uris.push("spotify:track:" + song);
-    }
-    console.log($('#playlist-input').val());
-    console.log(playlistData);
-    console.log(accessToken);
-    //Create the Playlist
-    $.ajax({
-      type: 'POST',
-      contentType: 'application/json',
-      dataType: 'jsonp',
-      headers: {
-        Authorization: 'Bearer ' + accessToken
-      },
-      url: 'https://api.spotify.com/v1/users/mellogood/playlists',
-      data: {
-        name: $('#playlist-input').val()
-      },
-      crossDomain : true,
-      xhrFields: {
-        withCredentials: false
+    if($('#playlist-input').val() !== "") {
+      var playlistData = { "uris": [] };
+      for(var song in playlist) {
+        playlistData.uris.push("spotify:track:" + song);
       }
-    })
-    .done(function(data) {
-      console.log('Created Playlist');
-      console.log(data);
-      //Add in the songs
-      // $.ajax({
-      //   type: 'POST',
-      //   dataType: 'application/json',
-      //   //TODO
-      //   url: 'https://api.spotify.com/v1/users/mellogood/playlists/data.uri/tracks',
-      //   data: playlistData,
-      //   crossDomain : true,
-      //   xhrFields: {
-      //     withCredentials: false
-      //   }
-      // })
-      // .done(function(data) {
-      //   console.log('Success!');
-      // })
-      // .fail( function(xhr, textStatus, errorThrown) { alert(xhr.responseText); });
-    })
-    .fail( function(xhr, textStatus, errorThrown) {
-      console.log(xhr);
-      console.log(textStatus);
-      console.log(errorThrown);
-     });
+      console.log($('#playlist-input').val());
+      console.log(playlistData);
+      //Create the Playlist
+      makeRequest(
+        'post',
+        'https://api.spotify.com/v1/users/mellogood/playlists',
+        {
+          'contentType': 'application/json',
+          'data': {
+            name: $('#playlist-input').val()
+          },
+          'dataType': 'jsonp',
+          'headers': {
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/json'
+          }
+        },
+        function(data) {
+          //TODO
+          console.log('Created Playlist');
+          console.log(data);
+          makeRequest(
+            'post',
+            'https://api.spotify.com/v1/users/mellogood/playlists/data.uri/tracks',
+            {
+              'contentType': 'application/json',
+              'data': playlistData,
+              'dataType': 'application/json',
+              'headers': {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+              }
+            },
+            function(data) {
+              console.log('success!');
+            }
+          );
+        }
+      );
+    } else {
+      warn('Please name your playlist first.');
+    }
   } else {
     warn('Please Log-In to save the playlist.');
   }
 }
 
 function logout() {
-  $('#login-status').html('<a href="https://accounts.spotify.com/authorize?client_id=66dbe5ac0dc04f3ca53b78f802c07153&redirect_uri=http://localhost:8000&scope=playlist-modify%20playlist-modify-public%20&response_type=token&state=123"><p>Log-In</p>');
+  //TODO - change from localhost
+  $('#login-status').html('<a href="https://accounts.spotify.com/authorize?client_id=66dbe5ac0dc04f3ca53b78f802c07153&redirect_uri=http://localhost:8000&scope=playlist-modify%20playlist-modify-public%20&response_type=token&state=123"><p>Log-In Again</p>');
 }
 
 function getUserID() {
-  $.ajax({
-    type: 'GET',
-    dataType: 'json',
-    url: 'https://api.spotify.com/v1/me',
-    headers: {
-      'Authorization': 'Bearer ' + accessToken
+  //getUserID
+  makeRequest(
+    'get',
+    'https://api.spotify.com/v1/me',
+    {
+      'contentType': 'application/json',
+      'dataType': 'json',
+      'headers': {
+        'Authorization': 'Bearer ' + accessToken,
+      }
     },
-    crossDomain : true,
-    xhrFields: {
-      withCredentials: false
+    function(data) {
+      userID = data.id;
+      //TODO - change from localhost
+      $('#login-status').html('<a href="http://localhost:8000"><p>Log-Out</p>');
     }
-  })
-  .done(function(data) {
-    userID = data.id;
-    //TODO - change to functioning url
-    $('#login-status').html('<a href="http://localhost:8000"><p>Log-Out</p>');
-  })
-  .fail( function(xhr, textStatus, errorThrown) { alert(xhr.responseText); });
+  );
 }
 
 //Check if they are logged in.
@@ -199,10 +189,29 @@ function getHashValue(key) {
   return matches ? matches[1] : null;
 }
 
+function makeRequest(type, url, params, cbk) {
+  reqBody = {
+    'type': type,
+    'url': url,
+    crossDomain : true,
+    xhrFields: {
+      withCredentials: false
+    }
+  };
+  for(var key in params) {
+    reqBody[key] = params[key];
+  }
+  $.ajax(reqBody)
+    .done(cbk)
+    .fail(function(xhr, textStatus, errorThrown) {
+      alert(xhr.responseText);
+    });
+}
+
 $(document).ready(function () {
   checkUser();
   //TODO - remove
-  search('artist', 'childish gambino');
+  // search('artist', 'childish gambino');
   //Excute different operations based on which input is focused
   $('input').keyup(function (e) {
     if(e.keyCode == 13) {
