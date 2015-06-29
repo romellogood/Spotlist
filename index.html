@@ -16,15 +16,17 @@
   <header>
     <article id="login-status">
       <a href="https://accounts.spotify.com/authorize?client_id=66dbe5ac0dc04f3ca53b78f802c07153&redirect_uri=http://localhost:8000&scope=playlist-modify%20playlist-modify-public%20&response_type=token&state=123">
-        <p>First, Log-In!</p>
+        <p>Login</p>
       </a>
     </article>
     <p id="title">Spotlist</p >
     <p id="tagline">Easily create a Spotify Playlist.</p>
   </header>
   <section id="playlist-area" class="col-sm-12 col-sm-5">
-    <input type="text" id="playlist-input" placeholder="Name your playlist.">
-    <button id="playlist-button" class="btn" onclick="savePlaylist()">Save Playlist</button>
+    <article id="playlist-bar">
+      <input type="text" id="playlist-input" placeholder="Name your playlist.">
+      <button id="playlist-button" class="btn" onclick="savePlaylist()">Save Playlist</button>
+    </article>
     <article id="playlist-list"></article>
   </section>
   <section id="search-area" class="col-sm-12 col-md-7">

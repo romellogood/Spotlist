@@ -19,6 +19,12 @@ header {
   p {
     display: inline;
   }
+  #login-status {
+    float: right;
+    margin: 10px;
+    font-size: 1.5em;
+    p { color: @green; }
+  }
   #title {
     margin-right: 10px;
     font-size: 4em;
@@ -27,38 +33,25 @@ header {
   #tagline {
     font-size: 2em;
   }
-  #login-status {
-    float: right;
-    margin: 10px;
-    font-size: 1.5em;
-    p { color: @green; }
-  }
-}
-
-footer {
-  height: 100px;
-  padding: 15px;
-  letter-spacing: 0.5px;
-  background-color: black;
-  color: white;
-  font-size: 1.25em;
-  a:link, a:visited, a:hover, a:active { text-decoration: none; color: @green; }
 }
 
 #playlist-area {
-  margin: auto 20px auto 20px;
-  #playlist-input {
-    height: 50px;
+  #playlist-bar {
+    width: 100%;
+    margin-bottom: 10px;
+    #playlist-input {
+      height: 50px;
+    }
+    #playlist-button {
+      height: 50px;
+      font-size: 1.25em;
+      background-color: @green;
+    }
   }
   #playlist-list {
     font-size: 1.25em;
     font-weight: bold;
     color: @green;
-  }
-  #playlist-button {
-    height: 50px;
-    font-size: 1.25em;
-    background-color: @green;
   }
 }
 
@@ -67,34 +60,30 @@ footer {
   margin: auto;
   #search-bar {
     width: 100%;
+    margin-bottom: 10px;
     select {
       width: 100px;
       height: 50px;
       border: 1px solid rgba(255, 0, 0, 0);
       border-radius: 0px;
-      // -webkit-appearance: none;
-      // -webkit-border-radius: 0px;
       background: rgba(132, 189, 0, 0);
       font-size: 1.25em;
     }
-  }
-  #search-input {
-    width: 300px;
-    height: 50px;
-  }
-  #search-button {
-    width: 100px;
-    height: 50px;
-    font-size: 1.25em;
-    background-color: @green;
+    #search-input {
+      width: 300px;
+      height: 50px;
+    }
+    #search-button {
+      width: 100px;
+      height: 50px;
+      font-size: 1.25em;
+      background-color: @green;
+    }
   }
   #search-results {
     font-size: 2em;
     font-weight: bold;
     color: @green;
-    .result-item {
-      display: block;
-    }
   }
 }
 
@@ -111,8 +100,14 @@ input {
   color: black;
 }
 
-.add-button:hover, .remove-button:hover {
-  color: white;
+.query-result:hover {
+  color: @grey;
+  .add-button { color: @green; }
+}
+
+.playlist-song:hover {
+  color: @grey;
+  .remove-button { color: @green; }
 }
 
 a:link, a:visited, a:hover, a:active { text-decoration: none; color: black; }
