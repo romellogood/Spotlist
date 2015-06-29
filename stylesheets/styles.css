@@ -78,6 +78,12 @@ header #tagline {
   font-weight: bold;
   color: #84bd00;
 }
+#search-area .result {
+  margin-bottom: 5px;
+}
+#search-area .result-song {
+  display: inline;
+}
 input {
   padding-left: 5px;
   border: 0;
@@ -86,14 +92,24 @@ input {
   color: black;
 }
 .add-button,
-.remove-button {
+.remove-button,
+.music-button {
   margin: 0px 5px 0px 0px;
   color: black;
 }
-.query-result:hover {
+.music-button:hover {
+  color: #84bd00;
+}
+.music-button:active {
+  color: white;
+}
+.playing {
+  color: #84bd00;
+}
+.result-song:hover {
   color: #828282;
 }
-.query-result:hover .add-button {
+.result-song:hover .add-button {
   color: #84bd00;
 }
 .playlist-song:hover {
@@ -101,6 +117,18 @@ input {
 }
 .playlist-song:hover .remove-button {
   color: #84bd00;
+}
+.result-song:active {
+  color: white;
+}
+.result-song:active .add-button {
+  color: white;
+}
+.playlist-song:active {
+  color: white;
+}
+.playlist-song:active .remove-button {
+  color: white;
 }
 a:link,
 a:visited,

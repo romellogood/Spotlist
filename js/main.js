@@ -1,6 +1,7 @@
 var playlist    = {},
     accessToken = '',
-    userID      = '';
+    userID      = '',
+    audioObject = null;
 
 function makeRequest(type, url, params, cbk) {
   reqBody = {
@@ -18,6 +19,7 @@ function makeRequest(type, url, params, cbk) {
     .done(cbk)
     .fail(function(xhr, textStatus, errorThrown) {
       alert(xhr.responseText);
+      console.log(xhr);
     });
 }
 
@@ -57,7 +59,7 @@ function appendToPage(data, type) {
       if(type == 'artist') {
         /*jshint multistr: true */
         $('#search-results').append(
-          '<p class="query-result" id="' + data[result].id +
+          '<p class="result result-artist" id="' + data[result].id +
           '" onclick="getArtistsTracks(this.id)">' + data[result].name +'</p>'
         );
       } else {
@@ -65,12 +67,16 @@ function appendToPage(data, type) {
          * Using {-] because it is a unique string and won't appear in a song title
          */
         $('#search-results').append(
-          '<p class="query-result" id="' + data[result].artists[0].name + '{-]' +
-          data[result].name + '{-]' + data[result].id +
-          '" onclick="addToPlaylist(this.id)"> \
-            <span class="glyphicon glyphicon-plus add-button"></span>' +
-            data[result].artists[0].name + '- ' + data[result].name +
-          '</p>'
+          '<div class="result"> \
+            <span class="glyphicon glyphicon-music music-button" \
+              id="' + data[result].id + '" onclick="playTrack(this.id)"></span> \
+            <p class="result-song" id="' + data[result].artists[0].name + '{-]' +
+            data[result].name + '{-]' + data[result].id +
+            '" onclick="addToPlaylist(this.id)"> \
+              <span class="glyphicon glyphicon-plus add-button"></span>' +
+              data[result].artists[0].name + '- ' + data[result].name +
+            '</p> \
+          </div>'
         );
       }
     }
@@ -90,11 +96,44 @@ function getArtistsTracks(artistID) {
   );
 }
 
+function playTrack(trackID) {
+  makeRequest(
+    'get',
+    'https://api.spotify.com/v1/tracks/' + trackID,
+    {
+      'dataType': 'json',
+    },
+    function(data) {
+      //If you clicked the song already playing: pause it.
+      if($('#' + trackID).hasClass('playing')) {
+        audioObject.pause();
+      } else {
+        //Pause a song if there is one playing.
+        if(audioObject) {
+          audioObject.pause();
+        }
+        audioObject = new Audio(data.preview_url);
+        audioObject.play();
+        audioObject.addEventListener('ended', function () {
+          $('.playing').removeClass('playing');
+        });
+        audioObject.addEventListener('pause', function () {
+          $('.playing').removeClass('playing');
+        });
+        $('#' + trackID).addClass('playing');
+      }
+    }
+  );
+}
+
+
 //ID Form = artistName{-]songName{-]songID
 function addToPlaylist(id) {
   id = id.split('{-]');
-  //Add songs into dictionary. Use dictionary so there won't be duplicates.
-  if(playlist[id[2]] === undefined) {
+  /* Add songs into dictionary. Use a dictionary to prevent duplicates.
+   * Make sure the song's id isn't in the dictionary and that the id isn't undefined.
+   */
+  if(playlist[id[2]] === undefined && id[2] !== undefined) {
     playlist[id[2]] = 1;
     /*jshint multistr: true */
     $('#playlist-list').append(
@@ -116,6 +155,8 @@ function removeFromPlaylist(id) {
 function savePlaylist() {
   if(accessToken === null) {
     warn('Please login to save your playlist.');
+  } else if($.isEmptyObject(playlist)) {
+    warn('Please add a song before saving the playlist.');
   } else {
     if($('#playlist-input').val() === "") {
       warn('Please name your playlist first.');
@@ -126,41 +167,38 @@ function savePlaylist() {
       for(var song in playlist) {
         playlistData.uris.push('spotify:track:' + song);
       }
-      console.log($('#playlist-input').val());
-      console.log(playlistData);
       //Create the Playlist
       makeRequest(
         'post',
-        'https://api.spotify.com/v1/users/mellogood/playlists',
+        'https://api.spotify.com/v1/users/' + userID + '/playlists',
         {
-          'contentType': 'application/json',
-          'data': {
-            name: $('#playlist-input').val()
-          },
-          'dataType': 'jsonp',
+          'contentType': 'json',
+          'dataType': 'json',
           'headers': {
             'Authorization': 'Bearer ' + accessToken,
-            'Content-Type': 'application/json'
-          }
+          },
+          'data': JSON.stringify({
+            'name': $('#playlist-input').val(),
+            'public': false
+          })
         },
         function(data) {
-          //TODO
-          console.log('Created Playlist');
-          console.log(data);
+          /* Returns an object with the newly created playlist's url(href)
+           * Now add the tracks into that playlist.
+           */
           makeRequest(
             'post',
-            'https://api.spotify.com/v1/users/mellogood/playlists/data.uri/tracks',
+            data.href + '/tracks',
             {
-              'contentType': 'application/json',
-              'data': playlistData,
-              'dataType': 'application/json',
+              'contentType': 'json',
+              'dataType': 'json',
               'headers': {
                 'Authorization': 'Bearer ' + accessToken,
-                'Content-Type': 'application/json'
-              }
+              },
+              'data': JSON.stringify(playlistData),
             },
             function(data) {
-              console.log('success!');
+              console.log('Successfully created playlist and added songs!');
             }
           );
         }
@@ -171,7 +209,7 @@ function savePlaylist() {
 
 function logout() {
   //TODO - change from localhost
-  $('#login-status').html('<a href="https://accounts.spotify.com/authorize?client_id=66dbe5ac0dc04f3ca53b78f802c07153&redirect_uri=http://localhost:8000&scope=playlist-modify%20playlist-modify-public%20&response_type=token&state=123"><p>LogIn</p>');
+  $('#login-status').html('<a href="https://accounts.spotify.com/authorize?client_id=66dbe5ac0dc04f3ca53b78f802c07153&redirect_uri=http://localhost:8000&scope=playlist-modify-public%20playlist-modify-private&response_type=token&state=123"><p>LogIn</p>');
 }
 
 function getUserID() {
@@ -211,7 +249,7 @@ function checkLoginStatus() {
 
 $(document).ready(function () {
   checkLoginStatus();
-  // search('artist', 'childish gambino'); //TODO - remove
+  search('artist', 'childish gambino'); //TODO - remove
   //Excute different operations based on which input is focused
   $('input').keyup(function (e) {
     if(e.keyCode == 13) {
